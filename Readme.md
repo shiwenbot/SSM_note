@@ -8,9 +8,21 @@
 
 1.引入dependencies
 ![img.png](img.png)
+
 2.创建配置文件applicationContext![img_2.png](img_2.png)
 现在就可以开始配置bean的属性了：
-id是唯一标识，想要管理一个特定的bean的时候，只需要告诉spring它的id就好了
+id是唯一标识，不能重复，想要管理一个特定的bean的时候，只需要告诉spring它的id就好了
 class就是平时写java的时候的那个class，也叫类
 ![img_3.png](img_3.png)
 这行就表示我把pojo包下面的Helloworld.class交给了spring管理，并且给这个文件起了个id叫Helloworld（注意：起什么id都可以，只不过这个比较适合）
+
+**IOC在Spring中的实现的测试**
+创建一个test类来测试一下吧！
+`@Test
+public void test(){
+    //获取ioc容器
+    ApplicationContext ioc = new ClassPathXmlApplicationContext("applicationContext.xml");
+    //获取bean对象，这个方法我用的是byname，也就是bean的id，也正是因为用的id，所以不知道bean的类型，因此需要强转
+    HelloWorld HehlloWorld = (HelloWorld)ioc.getBean("helloworld");
+    HehlloWorld.sayHello();
+}`
