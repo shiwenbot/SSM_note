@@ -18,11 +18,11 @@ class就是平时写java的时候的那个class，也叫类
 
 **IOC在Spring中的实现的测试**
 创建一个test类来测试一下吧！
-`@Test
+```@Test
 public void test(){
     //获取ioc容器
     ApplicationContext ioc = new ClassPathXmlApplicationContext("applicationContext.xml");
     //获取bean对象，这个方法我用的是byname，也就是bean的id，也正是因为用的id，所以不知道bean的类型，因此需要强转
     HelloWorld HehlloWorld = (HelloWorld)ioc.getBean("helloworld");
     HehlloWorld.sayHello();
-}`
+    }```
