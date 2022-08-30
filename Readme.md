@@ -1,6 +1,6 @@
 # Spring
 
-###**1.1 ioc在Spring中的实现**
+### 1.1 ioc在Spring中的实现
 
 ![img_1.png](png/img_1.png)
 使用的API是ApplicationContext
@@ -38,7 +38,7 @@ class就是平时写java的时候的那个class，也叫类
 ```
 这行就表示我把pojo包下面的Helloworld.class交给了spring管理，并且给这个文件起了个id叫Helloworld（注意：起什么id都可以，只不过这个比较适合）
 
-####创建一个test类来测试一下吧！
+#### 创建一个test类来测试一下吧！
 ```java
 public class test{
     @Test
@@ -51,7 +51,7 @@ public class test{
     }
 }
 ```
-###**1.2 通过DI来赋值**
+### 1.2 通过DI来赋值
 为成员变量赋值有两种方法，一是set方法，另一个是有参构造，在spring里面也一样
 ```xml
 <!--方法一-->
@@ -63,7 +63,7 @@ public class test{
     <constructuor-arg value="Shiwen"></constructuor-arg>
 </bean>
 ```
-####**为类类型的属性赋值**
+#### 为类类型的属性赋值
 因为class不可以像成员变量一样直接赋值（不可以用value了），两种解决办法
 1. 外部bean先设置好value，再用ref来引用这个bean
 ```xml
@@ -88,7 +88,7 @@ public class test{
 这个是报的错误
 ![img_8.png](img_8.png)
 
-###**1.3 factory bean**
+### 1.3 factory bean
 ![img_9.png](img_9.png)
 ![img_10.png](img_10.png)
 不需要配置User，直接在xml里面配置beanfactory，通过beanfactory的get object方法也可以得到User
