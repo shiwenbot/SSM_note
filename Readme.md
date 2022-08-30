@@ -1,6 +1,6 @@
-#**Spring**
+#Spring
 
-###**1.1 ioc在Spring中的实现**
+###1.1 ioc在Spring中的实现
 
 ![img_1.png](png/img_1.png)
 使用的API是ApplicationContext
