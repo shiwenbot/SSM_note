@@ -93,15 +93,158 @@ public class test{
 ![img_10.png](img_10.png)
 不需要配置User，直接在xml里面配置beanfactory，通过beanfactory的get object方法也可以得到User
 
-**自动装配**
+### 1.4 自动装配
 有了自动装配，就不需要像上文一样找到对应的bean的id来为类类型的属性赋值了
 如果不使用自动装配
-![img_11.png](img_11.png)
+```xml
+<bean id="userService" class="offer.userService">
+    <property name="userDao" ref="userDao"></property>
+</bean>
+<bean id="userDao" class="offer.userDao"></bean>
+```
 _通过xml实现自动装配_
 1. byType
-![img_12.png](img_12.png)
+```xml
+<bean id="userService" class="offer.userService" autowire="byType">
+    <property name="userDao" ref="userDao"></property>
+</bean>
+<bean id="userDao" class="offer.userDao" autowire="byType"></bean>
+```
 _基于注解来管理bean_
-![img_13.png](img_13.png)    
-   ![img_14.png](img_14.png)
-   配置注解并扫描
 
+1.添加注解
+```java
+@Compontent
+@Controller
+@Service
+@Repository
+```
+2.扫描
+```xml
+<context:component-scan base-package="offer"> 
+</context:component-scan>
+```
+
+3.不基于xml，可以使用@Autowired
+```java
+//直接把它加到成员变量上即可
+@Controller
+public class UserController{ 
+    @Autowired
+    private UserService userService;
+    public void saveUser(){
+        userService.saveUser();
+    }
+}
+```
+
+### 2.1 aop相关术语
+1.横切关注点：即非核心业务代码，例如计算器例子中的日志功能
+2.切面：封装横切关注点的类
+3.通知：和横切关注点是一样的东西，相对于切面来讲就叫通知
+
+例子：
+1.创建目标类和切面类并且交给ioc管理
+```java
+//目标类
+@Component
+public class CalculatorImpl implements Calculator {
+    @Override
+    public int add(int i, int j) {
+        int result = i + j;
+        System.out.println("方法内部，result："+result);
+        return result;
+    }
+
+    @Override
+    public int sub(int i, int j) {
+        int result = i - j;
+        System.out.println("方法内部，result："+result);
+        return result;
+    }
+
+    @Override
+    public int mul(int i, int j) {
+        int result = i * j;
+        System.out.println("方法内部，result："+result);
+        return result;
+    }
+
+    @Override
+    public int div(int i, int j) {
+        int result = i / j;
+        System.out.println("方法内部，result："+result);
+        return result;
+    }
+}
+
+//切面类
+@Component
+@Aspect //将当前组件标识为切面
+public class LoggerAspect {
+
+   @Pointcut("execution(* com.atguigu.spring.aop.annotation.CalculatorImpl.*(..))")
+   public void pointCut() {
+   }
+
+   //@Before("execution(public int com.atguigu.spring.aop.annotation.CalculatorImpl.add(int, int))")
+   //@Before("execution(* com.atguigu.spring.aop.annotation.CalculatorImpl.*(..))")
+   @Before("pointCut()")
+   public void beforeAdviceMethod(JoinPoint joinPoint) {
+      //获取连接点所对应方法的签名信息
+      Signature signature = joinPoint.getSignature();
+      //获取连接点所对应方法的参数
+      Object[] args = joinPoint.getArgs();
+      System.out.println("LoggerAspect，方法：" + signature.getName() + "，参数：" + Arrays.toString(args));
+   }
+
+   @After("pointCut()")
+   public void afterAdviceMethod(JoinPoint joinPoint) {
+      //获取连接点所对应方法的签名信息
+      Signature signature = joinPoint.getSignature();
+      System.out.println("LoggerAspect，方法：" + signature.getName() + "，执行完毕");
+   }
+
+   /**
+    * 在返回通知中若要获取目标对象方法的返回值
+    * 只需要通过@AfterReturning注解的returning属性
+    * 就可以将通知方法的某个参数指定为接收目标对象方法的返回值的参数
+    */
+   @AfterReturning(value = "pointCut()", returning = "result")
+   public void afterReturningAdviceMethod(JoinPoint joinPoint, Object result) {
+      //获取连接点所对应方法的签名信息
+      Signature signature = joinPoint.getSignature();
+      System.out.println("LoggerAspect，方法：" + signature.getName() + "，结果：" + result);
+   }
+
+   /**
+    * 在异常通知中若要获取目标对象方法的异常
+    * 只需要通过AfterThrowing注解的throwing属性
+    * 就可以将通知方法的某个参数指定为接收目标对象方法出现的异常的参数
+    */
+   @AfterThrowing(value = "pointCut()", throwing = "ex")
+   public void afterThrowingAdviceMethod(JoinPoint joinPoint, Throwable ex) {
+      //获取连接点所对应方法的签名信息
+      Signature signature = joinPoint.getSignature();
+      System.out.println("LoggerAspect，方法：" + signature.getName() + "，异常：" + ex);
+   }
+
+   @Around("pointCut()")
+   //环绕通知的方法的返回值一定要和目标对象方法的返回值一致
+   public Object aroundAdviceMethod(ProceedingJoinPoint joinPoint) {
+      Object result = null;
+      try {
+         System.out.println("环绕通知-->前置通知");
+         //表示目标对象方法的执行
+         result = joinPoint.proceed();
+         System.out.println("环绕通知-->返回通知");
+      } catch (Throwable throwable) {
+         throwable.printStackTrace();
+         System.out.println("环绕通知-->异常通知");
+      } finally {
+         System.out.println("环绕通知-->后置通知");
+      }
+      return result;
+   }
+}
+```
